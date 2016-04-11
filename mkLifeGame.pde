@@ -60,18 +60,6 @@ void mkcsv(PImage img) {
   }
   saveStrings("data.csv", lines);
 }
-/*
-//CaptureToPNG(ファイル, ファイル名に付与する数字, 数字桁数 ,ドットを含む拡張子);
-void CaptureToPNG(String fileURL, int num, int digits, String fileType) {  
-
-  //指定した桁数に満たない数字の右側に0を追加
-  String numString = nf(num, digits); 
-
-  // フレーム枚にpngへキャプチャ
-  String pngName = fileURL + numString + fileType; 
-  save(pngName);
-}
-*/
 void setup() {
   img=loadImage("G.png");
   size(img.width, img.height);
@@ -87,8 +75,8 @@ void setup() {
   gray_img=makeGrayImg(img);
   mkcsv(gray_img);
   frameRate(3);
-  gifMaker = new GifMaker(this, "lifegame.gif"); // 'box.gif'という名前でGIFアニメを作成
-  gifMaker.setDelay(100); // アニメーションの間隔を20ms(=50fps)に設定
+  gifMaker = new GifMaker(this, "lifegame.gif");
+  gifMaker.setDelay(100);
 }
 
 void draw() {
@@ -97,9 +85,8 @@ void draw() {
   update();
   for ( int x=1; x<numCellX+1; x++ ) {
     for ( int y=1; y<numCellY+1; y++ ) {
-      // ↓ここからライフゲームの描画に関する処理を書く
       if (frameCount>1) {
-        cell[y][x]=temp[y][x];//
+        cell[y][x]=temp[y][x];
       }
       if (cell[y][x]==1) {
         fill(#00ff00);
@@ -110,17 +97,11 @@ void draw() {
       }
     }
   }
-  gifMaker.addFrame(); // 現在の画面をアニメーションのコマとして追加
-
-  if (frameCount >= 100) { // 100コマアニメーションした時
-    gifMaker.finish(); // GIFアニメの作成を終了
+  gifMaker.addFrame();
+  if (frameCount >= 100) {
+    gifMaker.finish();
     exit();
   }
-  /*
-  //1フレームごとにpngでキャプチャ
-  CaptureToPNG("./capture/frame_", i, 3, ".png"); 
-  i++;
-  */
 }
 void update() {
   for (int i=1; i<numCellY+1; i++) {
