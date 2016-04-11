@@ -2,12 +2,7 @@ PImage img;
 PImage gray_img;
 int cellWidth=5;
 int cellHeight=5;
-void setup() {
-  img=loadImage("G.png");
-  size(img.width, img.height);
-  stroke(90);
-  noLoop();
-}
+
 int setColor(int posx, int posy) {
   int clr=0;
   for (int k=0; k<cellHeight; k++) {
@@ -38,27 +33,33 @@ PImage makeGrayImg(PImage img){
   }
   return gray_img;
 }
-void draw() {
-  gray_img=makeGrayImg(img);
-//  gray_img.updatePixels();
-//  image(gray_img, 0, 0);
-  String [] lines = new String[gray_img.height/cellHeight];
-  for (int i=0; i<gray_img.height/cellHeight; i++) {
-    String [] data = new String[gray_img.width/cellWidth];
-    for (int j=0; j<gray_img.width/cellWidth; j++) {
-//      fill(setColor(j*cellWidth,i*cellHeight));
+void mkcsv(PImage img){
+  String [] lines = new String[img.height/cellHeight];
+  for (int i=0; i<img.height/cellHeight; i++) {
+    String [] data = new String[img.width/cellWidth];
+    for (int j=0; j<img.width/cellWidth; j++) {
       println(setColor(i*cellWidth,j*cellHeight));
       if(setColor(j*cellWidth,i*cellHeight)>128){
         data[j]="0";
-        fill(255);
       }else{
         data[j]="1";
-        fill(0);
       }
-      rect(j*cellWidth,i*cellHeight,cellWidth,cellHeight);
     }
     lines[i]=join(data, ',');
   }
   saveStrings("data.csv", lines);
+}
+
+void setup() {
+  img=loadImage("G.png");
+  size(img.width, img.height);
+  stroke(90);
+  gray_img=makeGrayImg(img);
+  mkcsv(gray_img);
+}
+
+void draw() {
+  
+  
 }
 
