@@ -2,18 +2,24 @@ import gifAnimation.*;
 GifMaker gifMaker;
 
 //make csv
+String imgName="icon.jpg";
 PImage img;
 PImage gray_img;
-int cellWidth=5;
-int cellHeight=5;
-int numCellX, numCellY;
 
 //lifegame
 int [][] cell;
 int [][] temp;
+int cellWidth=5;
+int cellHeight=5;
+int numCellX, numCellY;
+int threshold=100;
+color backClr=#888888;
+color strokeClr=255;
 
 int setColor(int posx, int posy) {
   int clr=0;
+  //cell内のピクセルデータ全てを平均するならこっちを使う
+  /*
   for (int k=0; k<cellHeight; k++) {
     for (int l=0; l<cellWidth; l++) {
       //      int pos = posx + posy*width;
@@ -25,6 +31,10 @@ int setColor(int posx, int posy) {
     }
   }
   return clr/(cellHeight*cellWidth);
+  */
+  color grayColor = gray_img.pixels[posy*(width)+posx];
+  clr=(int)red(grayColor);
+  return clr;
 }
 PImage makeGrayImg(PImage img) {
   gray_img = createImage( img.width, img.height, RGB );
@@ -48,7 +58,7 @@ void mkcsv(PImage img) {
     String [] data = new String[numCellX];
     for (int j=0; j<numCellX; j++) {
       println(setColor(i*cellWidth, j*cellHeight));
-      if (setColor(j*cellWidth, i*cellHeight)>128) {
+      if (setColor(j*cellWidth, i*cellHeight)>threshold) {
         cell[i+1][j+1]=0;
         data[j]="0";
       } else {
@@ -61,7 +71,7 @@ void mkcsv(PImage img) {
   saveStrings("data.csv", lines);
 }
 void setup() {
-  img=loadImage("G.png");
+  img=loadImage(imgName);
   size(img.width, img.height);
   numCellX = width/cellWidth;
   numCellY = height/cellHeight;
@@ -74,14 +84,15 @@ void setup() {
   }
   gray_img=makeGrayImg(img);
   mkcsv(gray_img);
-  frameRate(3);
-  gifMaker = new GifMaker(this, "lifegame.gif");
-  gifMaker.setDelay(100);
+//  frameRate(3);
+  stroke(strokeClr);
+  noStroke();
+  gifMaker = new GifMaker(this, "lifegamecolor.gif");
+  gifMaker.setDelay(10);
 }
 
 void draw() {
-  background( 0 );
-  stroke( 0 );
+  background(backClr);
   update();
   for ( int x=1; x<numCellX+1; x++ ) {
     for ( int y=1; y<numCellY+1; y++ ) {
@@ -89,16 +100,16 @@ void draw() {
         cell[y][x]=temp[y][x];
       }
       if (cell[y][x]==1) {
-        fill(#00ff00);
-        rect(x*cellWidth, y*cellHeight, cellWidth, cellHeight);
+        fill(img.get(x*cellWidth,y*cellHeight));
+        rect((x-1)*cellWidth, (y-1)*cellHeight, cellWidth, cellHeight);
       } else {
-        fill(#000000);
-        rect(x*cellWidth, y*cellHeight, cellWidth, cellHeight);
+        fill(backClr);
+        rect((x-1)*cellWidth, (y-1)*cellHeight, cellWidth, cellHeight);
       }
     }
   }
   gifMaker.addFrame();
-  if (frameCount >= 100) {
+  if (frameCount >= 200) {
     gifMaker.finish();
     exit();
   }
@@ -133,7 +144,8 @@ void update() {
       }
       if (cnt==3) {
         temp[i][j]=1;
-      } else if (cnt<=1||cnt>3) {
+        //ホントは1,3
+      } else if (cnt<=1||cnt>4) {
         temp[i][j]=0;
       }
     }
